@@ -249,8 +249,8 @@ class Tapper:
                     #player_boost_multi_tap_coins = player_data['data']['boost']['multi_tap']['coins']
                     #player_boost_multi_tap_time = player_data['data']['multi_tap']
 
-                    logger.success(f"{self.session_name} | Login ok! | "
-                                   f"Player: <c> {player_username} </c> | Total Coins: <c>{player_coins:,}</c> Collected coins <c>{player_collected_coins:,} </c> | Energy: <e>{player_energy:,}</e>, Total: <e>{player_energy_limit:,}</e>")
+                    logger.info(f"{self.session_name} | Login:  | "
+                                   f"Player: <g>{player_username}</g> | Coins: Total <c>{player_coins:,}</c> Collected <c>{player_collected_coins:,}</c> | Energy: <e>{player_energy:,}/{player_energy_limit:,}</e>")
 
                     #logger.success(f"{self.session_name} | Boosts | "
                     #               f"Boost_restore_energy: {player_boost_restore_energy} | boost_energy_turbo {player_boost_energy_turbo} (<c>{player_boost_energy_turbo_coins}</c> coins) | boost_turbo {player_boost_turbo} (<c>{player_boost_turbo_coins}</c> coins) Boost_multi_tap {player_boost_multi_tap} (<c>{player_boost_multi_tap_coins}</c> coins) last activated: <c>{player_boost_multi_tap_time} </c>")
@@ -258,7 +258,8 @@ class Tapper:
                     if not player_data:
                         continue
 
-                taps = random.randint(a=settings.RANDOM_TAPS_COUNT[0], b=settings.RANDOM_TAPS_COUNT[1])
+
+                taps = random.randint(*settings.RANDOM_TAPS_COUNT)
                 taps_data = await self.task_mine(http_client=http_client, taps=taps)
 
                 tap_energy = taps_data['data']['energy']
@@ -285,8 +286,8 @@ class Tapper:
                 tap_boost_multi_tap_coins = taps_data['data']['boost']['multi_tap']['coins']
                 tap_boost_multi_tap_time = taps_data['data']['multi_tap']
 
-                logger.success(f"{self.session_name} | Successful tapped! | "
-                               f" Taps: <b>{taps:,}</b>, Tapped coins: <d>{tap_coins:,}</d> Total Coins: <c>{tap_coins_total:,}</c> | Energy: Used: <e> {tap_energy:,}</e>, Total: <e>{tap_energy_limit:,}</e>")
+                logger.success(f"{self.session_name} | Tapped: | "
+                               f"Taps: <g>{taps:,}</g>, Tapped coins: <c>{tap_coins:,}</c> Total Coins: <c>{tap_coins_total:,}</c> | Energy: <e> {tap_energy:,}/{tap_energy_limit:,}</e>")
 
                 if settings.APPLY_DAILY_BOOST:
                     if tap_boost_energy_turbo:
@@ -325,7 +326,7 @@ class Tapper:
                     if tap_boost_multi_tap:
                         current_time = datetime.now(timezone.utc).timestamp()-7200
                         tap_boost_multi_tap_time_formatted = datetime.strptime(tap_boost_multi_tap_time, "%Y-%m-%d %H:%M:%SZ").timestamp()
-                        print(current_time - tap_boost_multi_tap_time_formatted)
+                        #print(current_time - tap_boost_multi_tap_time_formatted)
 
                         if current_time - tap_boost_multi_tap_time_formatted >= 3601:
                             logger.info(f"{self.session_name} | Sleep 5s before activate <e>boost_multi_tap</e>")
@@ -351,7 +352,7 @@ class Tapper:
                     continue
 
                 if tap_energy < settings.MIN_AVAILABLE_ENERGY:
-                    random_sleep = random.randint(settings.SLEEP_BY_MIN_ENERGY[0], settings.SLEEP_BY_MIN_ENERGY[1])
+                    random_sleep = random.randint(*settings.SLEEP_BY_MIN_ENERGY)
                     logger.info(f"{self.session_name} | Minimum energy reached: {tap_energy}")
                     logger.info(f"{self.session_name} | Sleep {random_sleep:,}s")
 
@@ -360,8 +361,8 @@ class Tapper:
                     access_token_created_time = 0
 
                 else:
-                    sleep_between_tap = random.randint(a=settings.SLEEP_BETWEEN_TAP[0], b=settings.SLEEP_BETWEEN_TAP[1])
-                    logger.info(f"Sleep between tap:  {sleep_between_tap}s")
+                    sleep_between_tap = random.randint(*settings.SLEEP_BETWEEN_TAP)
+                    logger.info(f"Sleep {sleep_between_tap}s between tap:")
                     await asyncio.sleep(delay=sleep_between_tap)
 
             except InvalidSession as error:
