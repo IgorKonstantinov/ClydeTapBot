@@ -80,19 +80,12 @@ class Tapper:
             ))
 
             auth_url = web_view.url
-            #print(auth_url)
             tg_web_data = unquote(
                 string=unquote(string= auth_url.split('user%3D', maxsplit=1)[1].split('%26auth_date', maxsplit=1)[0]))
 
             tg_web_data_json = json.loads(tg_web_data)
-            #print(tg_web_data_json)
 
             self.user_id = (await self.tg_client.get_me()).id
-
-            # if (await self.tg_client.get_me()).username:
-            #     self.username = (await self.tg_client.get_me()).username
-            # else:
-            #     self.username = ''
             self.username = ''
 
             if with_tg is False:
@@ -117,20 +110,15 @@ class Tapper:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
             await asyncio.sleep(delay=30)
 
-    async def login(self, http_client: aiohttp.ClientSession, tg_web_data) :
-        response_text = ''
+    async def login(self, http_client: aiohttp.ClientSession, tg_web_data):
         try:
             data = tg_web_data
             login_url = f"https://api.clydetap.site/api/user/{self.user_id}/per/hour"
 
             response = await http_client.post(url=login_url, data=data)
-            response_text = await response.text()
             response.raise_for_status()
 
             response_json = await response.json()
-
-            #print(response_json)
-
             return response_json
 
         except Exception as error:
@@ -139,20 +127,17 @@ class Tapper:
 
     async def task_mine(self, http_client: aiohttp.ClientSession, taps):
         try:
-
             json_data = { 'coins': taps, "energy": taps }
             task_url = f"https://api.clydetap.site/api/user/{self.user_id}/taped"
 
             response = await http_client.post(url=task_url, json=json_data)
-            response_text = await response.text()
             response.raise_for_status()
 
             response_json = await response.json()
             return response_json
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error} | "
-                         f"Response text: {response_text}")
+            logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error}")
             await asyncio.sleep(delay=30)
 
     async def active_day_bonus(self, http_client: aiohttp.ClientSession, user: int ):
@@ -160,78 +145,62 @@ class Tapper:
             active_day_bonus_url = f"https://api.clydetap.site/api/user/{user}/bonus"
 
             response = await http_client.post(url=active_day_bonus_url)
-            response_text = await response.text()
             response.raise_for_status()
 
             response_json = await response.json()
             return response_json
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error} | "
-                         f"Response text: {response_text}")
+            logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error} ")
             await asyncio.sleep(delay=30)
 
     async def boost_energy_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-        response_text = ''
-
         try:
             boost_energy_turbo_url = f"https://api.clydetap.site/api/user/{user}/energy-turbo/update"
             response = await http_client.post(url=boost_energy_turbo_url, json={'coins': coins})
-            response_text = await response.text()
             response.raise_for_status()
             return True
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply energy-turbo-boost {coins} coins: {error} | "
-                         f"Response text: {response_text[:128]}")
-            await asyncio.sleep(delay=3)
+            logger.error(f"{self.session_name} | Unknown error when Apply energy-turbo-boost {coins} coins: {error} ")
+            await asyncio.sleep(delay=30)
             return False
 
     async def boost_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-        response_text = ''
         try:
             boost_turbo_url = f"https://api.clydetap.site/api/user/{user}/turbo/update"
             response = await http_client.post(url=boost_turbo_url, json={'coins': coins})
-            response_text = await response.text()
             response.raise_for_status()
             return True
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply turbo-boost {coins} coins: {error} | "
-                         f"Response text: {response_text[:128]}")
-            await asyncio.sleep(delay=3)
+            logger.error(f"{self.session_name} | Unknown error when Apply turbo-boost {coins} coins: {error}")
+            await asyncio.sleep(delay=30)
             return False
 
     async def boost_multi_tap(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-        response_text = ''
         try:
             boost_multi_tap_url = f"https://api.clydetap.site/api/user/{user}/multi-tap/update"
             response = await http_client.post(url=boost_multi_tap_url, json={'coins': coins})
-            response_text = await response.text()
             response.raise_for_status()
             return True
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply multi_tap-boost {coins} coins: {error} | "
-                         f"Response text: {response_text[:128]}")
-            await asyncio.sleep(delay=3)
+            logger.error(f"{self.session_name} | Unknown error when Apply multi_tap-boost {coins} coins: {error}")
+            await asyncio.sleep(delay=30)
             return False
 
     async def boost_restore_energy(self, http_client: aiohttp.ClientSession, user: int) -> bool:
-        response_text = ''
         try:
             boost_restore_energy_url = f"https://api.clydetap.site/api/user/{user}/restore/energy"
             response = await http_client.post(url=boost_restore_energy_url)
-            response_text = await response.text()
             response.raise_for_status()
             return True
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply boost_restore_energy: {error} | "
-                         f"Response text: {response_text[:128]}")
-            await asyncio.sleep(delay=3)
+            logger.error(f"{self.session_name} | Unknown error when Apply boost_restore_energy: {error}")
+            await asyncio.sleep(delay=30)
             return False
-
     async def run(self, proxy: str | None) -> None:
         access_token_created_time = 0
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -247,12 +216,15 @@ class Tapper:
                 if not tg_web_data:
                     continue
 
+                if http_client.closed:
+                    proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
+                    http_client = aiohttp.ClientSession(headers=headers, connector=proxy_conn)
+
                 if time() - access_token_created_time >= 3600:
                     tg_web_data = await self.get_tg_web_data(proxy=proxy)
                     access_token_created_time = time()
 
                     player_data = await self.login(http_client=http_client, tg_web_data=tg_web_data)
-                    #print(player_data)
 
                     player_username = player_data['data']['username']
                     player_coins = player_data['data']['coins']
@@ -352,11 +324,7 @@ class Tapper:
 
                     if tap_boost_multi_tap:
                         current_time = datetime.now(timezone.utc).timestamp()-7200
-                        #print(current_time)
-
                         tap_boost_multi_tap_time_formatted = datetime.strptime(tap_boost_multi_tap_time, "%Y-%m-%d %H:%M:%SZ").timestamp()
-                        #print(tap_boost_multi_tap_time_formatted)
-
                         print(current_time - tap_boost_multi_tap_time_formatted)
 
                         if current_time - tap_boost_multi_tap_time_formatted >= 3601:
@@ -370,7 +338,7 @@ class Tapper:
                                 boost_multi_tap_time = time()
                             continue
 
-                if (tap_boost_restore_energy and tap_energy < 1000) :
+                if tap_boost_restore_energy and tap_energy < 1000:
                     logger.info(f"{self.session_name} | Sleep 5s before activate <e>boost_restore_energy</e>")
                     await asyncio.sleep(delay=5)
 
@@ -383,18 +351,16 @@ class Tapper:
                     continue
 
                 if tap_energy < settings.MIN_AVAILABLE_ENERGY:
-                    await http_client.close()
                     random_sleep = random.randint(settings.SLEEP_BY_MIN_ENERGY[0], settings.SLEEP_BY_MIN_ENERGY[1])
-
                     logger.info(f"{self.session_name} | Minimum energy reached: {tap_energy}")
                     logger.info(f"{self.session_name} | Sleep {random_sleep:,}s")
 
                     await asyncio.sleep(delay=random_sleep)
+                    await http_client.close()
                     access_token_created_time = 0
 
                 else:
                     sleep_between_tap = random.randint(a=settings.SLEEP_BETWEEN_TAP[0], b=settings.SLEEP_BETWEEN_TAP[1])
-
                     logger.info(f"Sleep between tap:  {sleep_between_tap}s")
                     await asyncio.sleep(delay=sleep_between_tap)
 
@@ -404,6 +370,8 @@ class Tapper:
             except Exception as error:
                 logger.error(f"{self.session_name} | Unknown error: {error}")
                 await asyncio.sleep(delay=30)
+                await http_client.close()
+                access_token_created_time = 0
 
 
 async def run_tapper(tg_client: Client, proxy: str | None):
