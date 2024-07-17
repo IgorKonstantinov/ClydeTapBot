@@ -357,12 +357,12 @@ class Tapper:
                     logger.info(f"{self.session_name} | Sleep {random_sleep:,}s")
 
                     await asyncio.sleep(delay=random_sleep)
-                    await http_client.close()
+                    #await http_client.close()
                     access_token_created_time = 0
 
                 else:
                     sleep_between_tap = random.randint(*settings.SLEEP_BETWEEN_TAP)
-                    logger.info(f"Sleep {sleep_between_tap}s between tap:")
+                    logger.info(f"Sleep {sleep_between_tap}s between tap")
                     await asyncio.sleep(delay=sleep_between_tap)
 
             except InvalidSession as error:

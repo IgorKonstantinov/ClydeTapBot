@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SLEEP_BY_MIN_ENERGY: list[int] = [30, 90]
 
     RANDOM_TAPS_COUNT: list[int] = [600, 1500]
-    SLEEP_BETWEEN_TAP: list[int] = [10, 30] # token lifetime 60sec!
+    SLEEP_BETWEEN_TAP: list[int] = [5, 10]     # token lifetime 60sec!
 
     APPLY_DAILY_BOOST: bool = True
 
