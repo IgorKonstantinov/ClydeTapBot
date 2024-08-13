@@ -1,6 +1,7 @@
 import asyncio
 import hmac
 import hashlib
+import pprint
 import random
 from urllib.parse import unquote, quote
 from time import time
@@ -80,18 +81,17 @@ class Tapper:
             ))
 
             auth_url = web_view.url
-            tg_web_data = unquote(
-                string=unquote(string= auth_url.split('user%3D', maxsplit=1)[1].split('%26auth_date', maxsplit=1)[0]))
 
-            tg_web_data_json = json.loads(tg_web_data)
+            tg_web_data = unquote(
+                string=unquote(
+                    string=auth_url.split('tgWebAppData=', maxsplit=1)[1].split('&tgWebAppVersion', maxsplit=1)[0]))
 
             self.user_id = (await self.tg_client.get_me()).id
-            self.username = ''
 
             if with_tg is False:
                 await self.tg_client.disconnect()
 
-            return tg_web_data_json
+            return tg_web_data
 
         except InvalidSession as error:
             raise error
@@ -110,9 +110,9 @@ class Tapper:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
             await asyncio.sleep(delay=30)
 
-    async def login(self, http_client: aiohttp.ClientSession, tg_web_data):
+    async def login(self, http_client: aiohttp.ClientSession, user_data):
         try:
-            data = tg_web_data
+            data = user_data
             login_url = f"https://api.clydetap.site/api/user/{self.user_id}/per/hour"
 
             response = await http_client.post(url=login_url, data=data)
@@ -210,6 +210,11 @@ class Tapper:
             await self.check_proxy(http_client=http_client, proxy=proxy)
 
         tg_web_data = await self.get_tg_web_data(proxy=proxy)
+        tg_web_data_parts = tg_web_data.split('&')
+        query_id = tg_web_data_parts[0].split('=')[1]
+        user_data = tg_web_data_parts[1].split('=')[1]
+        auth_date = tg_web_data_parts[2].split('=')[1]
+        hash_value = tg_web_data_parts[3].split('=')[1]
 
         while True:
             try:
@@ -222,9 +227,14 @@ class Tapper:
 
                 if time() - access_token_created_time >= 3600:
                     tg_web_data = await self.get_tg_web_data(proxy=proxy)
+                    tg_web_data_parts = tg_web_data.split('&')
+                    user_data = tg_web_data_parts[1].split('=')[1]
+
                     access_token_created_time = time()
 
-                    player_data = await self.login(http_client=http_client, tg_web_data=tg_web_data)
+                    http_client.headers["init-data"] = tg_web_data
+
+                    player_data = await self.login(http_client=http_client, user_data=user_data)
 
                     player_username = player_data['data']['username']
                     player_coins = player_data['data']['coins']
@@ -257,7 +267,6 @@ class Tapper:
 
                     if not player_data:
                         continue
-
 
                 taps = random.randint(*settings.RANDOM_TAPS_COUNT)
                 taps_data = await self.task_mine(http_client=http_client, taps=taps)
