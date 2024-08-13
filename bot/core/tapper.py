@@ -400,6 +400,7 @@ class Tapper:
                                 f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
                                 f"Заполняет энергию до максимума")
                             player_energy = player_energy_limit
+                            player_boost_restore_energy = False
                             await asyncio.sleep(delay=random_sleep)
 
                 else:
