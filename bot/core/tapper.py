@@ -154,53 +154,84 @@ class Tapper:
             logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error} ")
             await asyncio.sleep(delay=30)
 
-    async def boost_energy_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
+    async def boosts(self, http_client: aiohttp.ClientSession, coins: int = 0, action: str = '') -> bool:
         try:
-            boost_energy_turbo_url = f"https://api.clydetap.site/api/user/{user}/energy-turbo/update"
-            response = await http_client.post(url=boost_energy_turbo_url, json={'coins': coins})
+            match action:
+                case 'energy-turbo':
+                    boosts_url = f"https://api.clydetap.site/api/user/{self.user_id}/energy-turbo/update"
+                    response = await http_client.post(url=boosts_url, json={'coins': coins})
+
+                case 'boost_turbo':
+                    boosts_url = f"https://api.clydetap.site/api/user/{self.user_id}/turbo/update"
+                    response = await http_client.post(url=boosts_url, json={'coins': coins})
+
+                case 'multi-tap':
+                    boosts_url = f"https://api.clydetap.site/api/user/{self.user_id}/multi-tap/update"
+                    response = await http_client.post(url=boosts_url, json={'coins': coins})
+
+                case 'restore-energy':
+                    boosts_url = f"https://api.clydetap.site/api/user/{self.user_id}/restore/energy"
+                    response = await http_client.post(url=boosts_url)
+
+                case 'active_day_bonus':
+                    boosts_url = f"https://api.clydetap.site/api/user/{self.user_id}/bonus"
+                    response = await http_client.post(url=boosts_url)
+
             response.raise_for_status()
             return True
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply energy-turbo-boost {coins} coins: {error} ")
+            logger.error(f"{self.session_name} | Unknown error when Apply Boost {action}: {error} ")
             await asyncio.sleep(delay=30)
             return False
 
-    async def boost_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-        try:
-            boost_turbo_url = f"https://api.clydetap.site/api/user/{user}/turbo/update"
-            response = await http_client.post(url=boost_turbo_url, json={'coins': coins})
-            response.raise_for_status()
-            return True
+    # async def boost_energy_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
+    #     try:
+    #         boost_energy_turbo_url = f"https://api.clydetap.site/api/user/{user}/energy-turbo/update"
+    #         response = await http_client.post(url=boost_energy_turbo_url, json={'coins': coins})
+    #         response.raise_for_status()
+    #         return True
+    #
+    #     except Exception as error:
+    #         logger.error(f"{self.session_name} | Unknown error when Apply energy-turbo-boost {coins} coins: {error} ")
+    #         await asyncio.sleep(delay=30)
+    #         return False
 
-        except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply turbo-boost {coins} coins: {error}")
-            await asyncio.sleep(delay=30)
-            return False
+    # async def boost_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
+    #     try:
+    #         boost_turbo_url = f"https://api.clydetap.site/api/user/{user}/turbo/update"
+    #         response = await http_client.post(url=boost_turbo_url, json={'coins': coins})
+    #         response.raise_for_status()
+    #         return True
+    #
+    #     except Exception as error:
+    #         logger.error(f"{self.session_name} | Unknown error when Apply turbo-boost {coins} coins: {error}")
+    #         await asyncio.sleep(delay=30)
+    #         return False
 
-    async def boost_multi_tap(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-        try:
-            boost_multi_tap_url = f"https://api.clydetap.site/api/user/{user}/multi-tap/update"
-            response = await http_client.post(url=boost_multi_tap_url, json={'coins': coins})
-            response.raise_for_status()
-            return True
+    # async def boost_multi_tap(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
+    #     try:
+    #         boost_multi_tap_url = f"https://api.clydetap.site/api/user/{user}/multi-tap/update"
+    #         response = await http_client.post(url=boost_multi_tap_url, json={'coins': coins})
+    #         response.raise_for_status()
+    #         return True
+    #
+    #     except Exception as error:
+    #         logger.error(f"{self.session_name} | Unknown error when Apply multi_tap-boost {coins} coins: {error}")
+    #         await asyncio.sleep(delay=30)
+    #         return False
 
-        except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply multi_tap-boost {coins} coins: {error}")
-            await asyncio.sleep(delay=30)
-            return False
-
-    async def boost_restore_energy(self, http_client: aiohttp.ClientSession, user: int) -> bool:
-        try:
-            boost_restore_energy_url = f"https://api.clydetap.site/api/user/{user}/restore/energy"
-            response = await http_client.post(url=boost_restore_energy_url)
-            response.raise_for_status()
-            return True
-
-        except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply boost_restore_energy: {error}")
-            await asyncio.sleep(delay=30)
-            return False
+    # async def boost_restore_energy(self, http_client: aiohttp.ClientSession, user: int) -> bool:
+    #     try:
+    #         boost_restore_energy_url = f"https://api.clydetap.site/api/user/{user}/restore/energy"
+    #         response = await http_client.post(url=boost_restore_energy_url)
+    #         response.raise_for_status()
+    #         return True
+    #
+    #     except Exception as error:
+    #         logger.error(f"{self.session_name} | Unknown error when Apply boost_restore_energy: {error}")
+    #         await asyncio.sleep(delay=30)
+    #         return False
     async def run(self, proxy: str | None) -> None:
         access_token_created_time = 0
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -218,6 +249,10 @@ class Tapper:
 
         while True:
             try:
+                #Randomize variables
+                random_sleep = random.randint(*settings.SLEEP_RANDOM)
+                long_sleep = random.randint(*settings.SLEEP_LONG)
+
                 if not tg_web_data:
                     continue
 
@@ -231,148 +266,147 @@ class Tapper:
                     user_data = tg_web_data_parts[1].split('=')[1]
 
                     access_token_created_time = time()
-
                     http_client.headers["init-data"] = tg_web_data
 
-                    player_data = await self.login(http_client=http_client, user_data=user_data)
+                player_data = await self.login(http_client=http_client, user_data=user_data)
 
-                    player_username = player_data['data']['username']
-                    player_coins = player_data['data']['coins']
-                    player_energy = player_data['data']['energy']
-                    player_energy_limit = player_data['data']['energy_limit']
+                player_username = player_data['data']['username']
+                player_coins = player_data['data']['coins']
+                player_coins_per_tap = player_data['data']['coins_per_tap']
+                player_collected_coins = player_data['data']['collected_coins']
 
-                    player_collected_coins = player_data['data']['collected_coins']
+                player_energy = player_data['data']['energy']
+                player_energy_limit = player_data['data']['energy_limit']
 
-                    #boost
-                    #player_boost_restore_energy = player_data['data']['boost']['restore_energy']['can_update']
-                    #player_boost_restore_energy_time = player_data['data']['restore_energy_at']
+                player_active_day_bonus = player_data['data']['active_day_bonus']
 
-                    #player_boost_energy_turbo = player_data['data']['boost']['energy_turbo']['can_update']
-                    #player_boost_energy_turbo_coins = player_data['data']['boost']['energy_turbo']['coins']
-                    #player_boost_energy_turbo_time = player_data['data']['energy_turbo_at']
+                #boost
+                player_boost_restore_energy = player_data['data']['boost']['restore_energy']['can_update']
 
-                    #player_boost_turbo = player_data['data']['boost']['turbo']['can_update']
-                    #player_boost_turbo_coins = player_data['data']['boost']['turbo']['coins']
-                    #player_boost_turbo_coins_time = player_data['data']['turbo']
+                player_boost_energy_turbo = player_data['data']['boost']['energy_turbo']['can_update']
+                player_boost_energy_turbo_coins = player_data['data']['boost']['energy_turbo']['coins']
 
-                    #player_boost_multi_tap = player_data['data']['boost']['multi_tap']['can_update']
-                    #player_boost_multi_tap_coins = player_data['data']['boost']['multi_tap']['coins']
-                    #player_boost_multi_tap_time = player_data['data']['multi_tap']
+                player_boost_turbo = player_data['data']['boost']['turbo']['can_update']
+                player_boost_turbo_coins = player_data['data']['boost']['turbo']['coins']
 
-                    logger.info(f"{self.session_name} | Login:  | "
-                                   f"Player: <g>{player_username}</g> | Coins: Total <c>{player_coins:,}</c> Collected <c>{player_collected_coins:,}</c> | Energy: <e>{player_energy:,}/{player_energy_limit:,}</e>")
+                player_boost_multi_tap = player_data['data']['boost']['multi_tap']['can_update']
+                player_boost_multi_tap_coins = player_data['data']['boost']['multi_tap']['coins']
+                player_boost_multi_tap_time = player_data['data']['multi_tap']
 
-                    #logger.success(f"{self.session_name} | Boosts | "
-                    #               f"Boost_restore_energy: {player_boost_restore_energy} | boost_energy_turbo {player_boost_energy_turbo} (<c>{player_boost_energy_turbo_coins}</c> coins) | boost_turbo {player_boost_turbo} (<c>{player_boost_turbo_coins}</c> coins) Boost_multi_tap {player_boost_multi_tap} (<c>{player_boost_multi_tap_coins}</c> coins) last activated: <c>{player_boost_multi_tap_time} </c>")
+                logger.info(f"{self.session_name} | Login:  | "
+                            f"Player: <g>{player_username}</g> | Coins: Total <c>{player_coins:,}</c> Collected <c>{player_collected_coins:,}</c> | Energy: <e>{player_energy:,}/{player_energy_limit:,}</e>")
 
-                    if not player_data:
-                        continue
+                logger.success(f"{self.session_name} | Boosts: | "
+                               f"restore_energy: {player_boost_restore_energy} | energy_turbo {player_boost_energy_turbo} (<c>{player_boost_energy_turbo_coins}</c> coins) | boost_turbo {player_boost_turbo} (<c>{player_boost_turbo_coins}</c> coins) Boost_multi_tap {player_boost_multi_tap} (<c>{player_boost_multi_tap_coins}</c> coins) last activated: <c>{player_boost_multi_tap_time} </c>")
 
-                taps = random.randint(*settings.RANDOM_TAPS_COUNT)
-                taps_data = await self.task_mine(http_client=http_client, taps=taps)
-
-                tap_energy = taps_data['data']['energy']
-                tap_energy_limit = taps_data['data']['energy_limit']
-                tap_coins_total = taps_data['data']['coins']
-                tap_coins_per_tap = taps_data['data']['coins_per_tap']
-                tap_coins = taps * tap_coins_per_tap
-
-                tap_active_day_bonus = taps_data['data']['active_day_bonus']
-
-                # boost
-                tap_boost_restore_energy = taps_data['data']['boost']['restore_energy']['can_update']
-                # tap_boost_restore_energy_time = tap_data['data']['restore_energy_at']
-
-                tap_boost_energy_turbo = taps_data['data']['boost']['energy_turbo']['can_update']
-                tap_boost_energy_turbo_coins = taps_data['data']['boost']['energy_turbo']['coins']
-                # tap_boost_energy_turbo_time = tap_data['data']['energy_turbo_at']
-
-                tap_boost_turbo = taps_data['data']['boost']['turbo']['can_update']
-                tap_boost_turbo_coins = taps_data['data']['boost']['turbo']['coins']
-                # tap_boost_turbo_coins_time = tap_data['data']['turbo']
-
-                tap_boost_multi_tap = taps_data['data']['boost']['multi_tap']['can_update']
-                tap_boost_multi_tap_coins = taps_data['data']['boost']['multi_tap']['coins']
-                tap_boost_multi_tap_time = taps_data['data']['multi_tap']
-
-                logger.success(f"{self.session_name} | Tapped: | "
-                               f"Taps: <g>{taps:,}</g>, Tapped coins: <c>{tap_coins:,}</c> Total Coins: <c>{tap_coins_total:,}</c> | Energy: <e> {tap_energy:,}/{tap_energy_limit:,}</e>")
-
-                if settings.APPLY_DAILY_BOOST:
-                    if tap_boost_energy_turbo:
-                        logger.info(f"{self.session_name} | Sleep 5s before activate <e>boost_energy_turbo</e>")
-                        await asyncio.sleep(delay=5)
-
-                        status = await self.boost_energy_turbo(http_client=http_client, coins=tap_boost_energy_turbo_coins, user=self.user_id)
-                        if status is True:
-                            logger.success(f"{self.session_name} | boost_energy_turbo successfully activated | турбо майнинг, х2 восстановления энергии за 2 часа")
-                            await asyncio.sleep(delay=1)
-
-                        continue
-
-                    if tap_active_day_bonus:
-                        logger.info(f"{self.session_name} | Sleep 5s before activate <e>tap_active_day_bonus</e>")
-                        await asyncio.sleep(delay=5)
-
-                        status = await self.active_day_bonus(http_client=http_client,user=self.user_id)
-                        if status is True:
-                            logger.success(f"{self.session_name} | active_day_bonus successfully activated ")
-                            await asyncio.sleep(delay=1)
-
-                        continue
-
-                    if tap_boost_turbo:
-                        logger.info(f"{self.session_name} | Sleep 5s before activate <e>boost_turbo</e>")
-                        await asyncio.sleep(delay=5)
-
-                        status = await self.boost_turbo(http_client=http_client, coins=tap_boost_energy_turbo_coins,user=self.user_id)
-                        if status is True:
-                            logger.success(f"{self.session_name} | boost_turbo successfully activated | майнинг, х2 прибыли в час на 1.5 часа")
-                            await asyncio.sleep(delay=1)
-
-                        continue
-
-                    if tap_boost_multi_tap:
-                        current_time = datetime.now(timezone.utc).timestamp()-7200
-                        tap_boost_multi_tap_time_formatted = datetime.strptime(tap_boost_multi_tap_time, "%Y-%m-%d %H:%M:%SZ").timestamp()
-                        #print(current_time - tap_boost_multi_tap_time_formatted)
-
-                        if current_time - tap_boost_multi_tap_time_formatted >= 3601:
-                            logger.info(f"{self.session_name} | Sleep 5s before activate <e>boost_multi_tap</e>")
-                            await asyncio.sleep(delay=5)
-
-                            status = await self.boost_multi_tap(http_client=http_client, coins=tap_boost_multi_tap_coins,user=self.user_id)
-                            if status is True:
-                                logger.success(f"{self.session_name} | boost_multi_tap successfully activated | майнинг, х2 прибыли за тап в час")
-                                await asyncio.sleep(delay=1)
-                                boost_multi_tap_time = time()
-                            continue
-
-                if tap_boost_restore_energy and tap_energy < 1000:
-                    logger.info(f"{self.session_name} | Sleep 5s before activate <e>boost_restore_energy</e>")
-                    await asyncio.sleep(delay=5)
-
-                    status = await self.boost_restore_energy(http_client=http_client,user=self.user_id)
-                    if status is True:
-                        logger.success(
-                            f"{self.session_name} | boost_restore_energy successfully activated | Заполняет энергию до максимума")
-                        await asyncio.sleep(delay=1)
-
+                if not player_data:
                     continue
 
-                if tap_energy < settings.MIN_AVAILABLE_ENERGY:
-                    random_sleep = random.randint(*settings.SLEEP_BY_MIN_ENERGY)
-                    logger.info(f"{self.session_name} | Minimum energy reached: {tap_energy}")
-                    logger.info(f"{self.session_name} | Sleep {random_sleep:,}s")
+                 #BOOSTS
+                if settings.APPLY_DAILY_BOOST:
 
-                    await asyncio.sleep(delay=random_sleep)
-                    #await http_client.close()
-                    access_token_created_time = 0
+                    if player_active_day_bonus:
+                        boost_action = 'active_day_bonus'
+                        logger.info(f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
+                        await asyncio.sleep(delay=random_sleep)
+
+                        status = await self.boosts(http_client=http_client, action=boost_action)
+                        if status is True:
+                            logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated")
+                            await asyncio.sleep(delay=random_sleep)
+
+                    if player_boost_energy_turbo:
+                        boost_action = 'energy-turbo'
+                        logger.info(f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
+                        await asyncio.sleep(delay=random_sleep)
+
+                        status = await self.boosts(http_client=http_client, coins=player_boost_energy_turbo_coins, action=boost_action)
+                        if status is True:
+                            logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
+                                           f"турбо майнинг, х2 восстановления энергии за 2 часа")
+                            await asyncio.sleep(delay=random_sleep)
+
+                    if player_boost_turbo:
+                        boost_action = 'boost_turbo'
+                        logger.info(f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
+                        await asyncio.sleep(delay=random_sleep)
+
+                        status = await self.boosts(http_client=http_client, coins=player_boost_turbo_coins, action=boost_action)
+                        if status is True:
+                            logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
+                                           f" майнинг, х2 прибыли в час на 1.5 часа")
+                            await asyncio.sleep(delay=random_sleep)
+
+                    if player_boost_multi_tap:
+                        boost_action = 'multi-tap'
+                        current_time = datetime.now(timezone.utc).timestamp()-7200
+                        player_boost_multi_tap_time_formatted = datetime.strptime(player_boost_multi_tap_time, "%Y-%m-%d %H:%M:%SZ").timestamp()
+
+                        if current_time - player_boost_multi_tap_time_formatted >= 3601:
+                            logger.info(f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
+                            await asyncio.sleep(delay=random_sleep)
+
+                            status = await self.boosts(http_client=http_client, coins=player_boost_multi_tap_coins,action=boost_action)
+                            if status is True:
+                                logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
+                                               f"майнинг, х2 прибыли за тап в час")
+                                await asyncio.sleep(delay=random_sleep)
+
+                # if player_boost_restore_energy and player_energy < 1000:
+                #     boost_action = 'restore-energy'
+                #     logger.info(f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
+                #     await asyncio.sleep(delay=random_sleep)
+                #
+                #     status = await self.boosts(http_client=http_client, action=boost_action)
+                #     if status is True:
+                #         logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
+                #                        f"Заполняет энергию до максимума")
+                #         await asyncio.sleep(delay=random_sleep)
+
+                    ### Taps
+                logger.info(f"{self.session_name} | sleep {random_sleep:,}s before bot action: <e>[tap]</e>")
+                await asyncio.sleep(delay=random_sleep)
+
+                while player_energy > 100:
+                    taps = random.randint(*settings.RANDOM_TAPS_COUNT)
+                    taps_coins = taps * player_coins_per_tap
+
+                    if taps_coins >= player_energy:
+                        taps_coins = player_energy
+                    taps_data = await self.task_mine(http_client=http_client, taps=taps_coins)
+
+                    if taps_data:
+                        player_energy -= taps_data['data']['energy']
+                        tap_coins_total = taps_data['data']['coins']
+                        tap_coins_per_tap = taps_data['data']['coins_per_tap']
+                        tap_coins = taps * tap_coins_per_tap
+                        tap_energy_limit = taps_data['data']['energy_limit']
+
+                        logger.success(
+                            f"{self.session_name} | Bot action: <red>[tap/{taps}]</red> | Coins: <c>[{tap_coins}/{tap_coins_total}]</c> Energy: <e> {player_energy:,}/{tap_energy_limit:,}</e>")
+                        await asyncio.sleep(delay=random_sleep)
+                    else:
+                        logger.error(f"{self.session_name} | Bot action:[tap] error")
+
+                    if player_boost_restore_energy and player_energy < (player_energy_limit / 10):
+                        boost_action = 'restore-energy'
+                        logger.info(
+                            f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
+                        await asyncio.sleep(delay=random_sleep)
+
+                        status = await self.boosts(http_client=http_client, action=boost_action)
+                        if status is True:
+                            logger.success(
+                                f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
+                                f"Заполняет энергию до максимума")
+                            player_energy = player_energy_limit
+                            await asyncio.sleep(delay=random_sleep)
 
                 else:
-                    sleep_between_tap = random.randint(*settings.SLEEP_BETWEEN_TAP)
-                    logger.info(f"Sleep {sleep_between_tap}s between tap")
-                    await asyncio.sleep(delay=sleep_between_tap)
+                    logger.info(f"{self.session_name} | Minimum energy reached: <e>{player_energy}</e>")
+
+                logger.info(f"{self.session_name} | Sleep {long_sleep:,}s")
+                await asyncio.sleep(delay=long_sleep)
 
             except InvalidSession as error:
                 raise error

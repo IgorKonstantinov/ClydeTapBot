@@ -6,10 +6,10 @@ class Settings(BaseSettings):
     API_ID: int
     API_HASH: str
 
-    MIN_AVAILABLE_ENERGY: int = 100
-    SLEEP_BY_MIN_ENERGY: list[int] = [30, 90]
+    SLEEP_LONG: list[int] = [30, 90]
+    SLEEP_RANDOM: list[int] = [3, 5]
 
-    RANDOM_TAPS_COUNT: list[int] = [600, 1500]
+    RANDOM_TAPS_COUNT: list[int] = [5, 10]
     SLEEP_BETWEEN_TAP: list[int] = [5, 10]     # token lifetime 60sec!
 
     APPLY_DAILY_BOOST: bool = True
