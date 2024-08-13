@@ -140,20 +140,6 @@ class Tapper:
             logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error}")
             await asyncio.sleep(delay=30)
 
-    async def active_day_bonus(self, http_client: aiohttp.ClientSession, user: int ):
-        try:
-            active_day_bonus_url = f"https://api.clydetap.site/api/user/{user}/bonus"
-
-            response = await http_client.post(url=active_day_bonus_url)
-            response.raise_for_status()
-
-            response_json = await response.json()
-            return response_json
-
-        except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when Apply task_mine: {error} ")
-            await asyncio.sleep(delay=30)
-
     async def boosts(self, http_client: aiohttp.ClientSession, coins: int = 0, action: str = '') -> bool:
         try:
             match action:
@@ -185,53 +171,7 @@ class Tapper:
             await asyncio.sleep(delay=30)
             return False
 
-    # async def boost_energy_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-    #     try:
-    #         boost_energy_turbo_url = f"https://api.clydetap.site/api/user/{user}/energy-turbo/update"
-    #         response = await http_client.post(url=boost_energy_turbo_url, json={'coins': coins})
-    #         response.raise_for_status()
-    #         return True
-    #
-    #     except Exception as error:
-    #         logger.error(f"{self.session_name} | Unknown error when Apply energy-turbo-boost {coins} coins: {error} ")
-    #         await asyncio.sleep(delay=30)
-    #         return False
 
-    # async def boost_turbo(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-    #     try:
-    #         boost_turbo_url = f"https://api.clydetap.site/api/user/{user}/turbo/update"
-    #         response = await http_client.post(url=boost_turbo_url, json={'coins': coins})
-    #         response.raise_for_status()
-    #         return True
-    #
-    #     except Exception as error:
-    #         logger.error(f"{self.session_name} | Unknown error when Apply turbo-boost {coins} coins: {error}")
-    #         await asyncio.sleep(delay=30)
-    #         return False
-
-    # async def boost_multi_tap(self, http_client: aiohttp.ClientSession, coins: int, user: int) -> bool:
-    #     try:
-    #         boost_multi_tap_url = f"https://api.clydetap.site/api/user/{user}/multi-tap/update"
-    #         response = await http_client.post(url=boost_multi_tap_url, json={'coins': coins})
-    #         response.raise_for_status()
-    #         return True
-    #
-    #     except Exception as error:
-    #         logger.error(f"{self.session_name} | Unknown error when Apply multi_tap-boost {coins} coins: {error}")
-    #         await asyncio.sleep(delay=30)
-    #         return False
-
-    # async def boost_restore_energy(self, http_client: aiohttp.ClientSession, user: int) -> bool:
-    #     try:
-    #         boost_restore_energy_url = f"https://api.clydetap.site/api/user/{user}/restore/energy"
-    #         response = await http_client.post(url=boost_restore_energy_url)
-    #         response.raise_for_status()
-    #         return True
-    #
-    #     except Exception as error:
-    #         logger.error(f"{self.session_name} | Unknown error when Apply boost_restore_energy: {error}")
-    #         await asyncio.sleep(delay=30)
-    #         return False
     async def run(self, proxy: str | None) -> None:
         access_token_created_time = 0
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -351,17 +291,6 @@ class Tapper:
                                 logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
                                                f"майнинг, х2 прибыли за тап в час")
                                 await asyncio.sleep(delay=random_sleep)
-
-                # if player_boost_restore_energy and player_energy < 1000:
-                #     boost_action = 'restore-energy'
-                #     logger.info(f"{self.session_name} | Sleep {random_sleep}s before activate <e>[{boost_action}]</e>")
-                #     await asyncio.sleep(delay=random_sleep)
-                #
-                #     status = await self.boosts(http_client=http_client, action=boost_action)
-                #     if status is True:
-                #         logger.success(f"{self.session_name} | Boost <red>[{boost_action}]</red> successfully activated | "
-                #                        f"Заполняет энергию до максимума")
-                #         await asyncio.sleep(delay=random_sleep)
 
                     ### Taps
                 logger.info(f"{self.session_name} | sleep {random_sleep:,}s before bot action: <e>[tap]</e>")
