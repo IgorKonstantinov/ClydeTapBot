@@ -1,5 +1,5 @@
 aiocfscrape==1.0.0
-aiohttp==3.10.8
+aiohttp==3.14.4
 aiohttp-proxy==0.1.2
 annotated-types==0.7.0
 async-timeout==4.0.3
